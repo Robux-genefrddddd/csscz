@@ -1,6 +1,9 @@
 import { RequestHandler } from "express";
-import { getAdminDb } from "../lib/firebase-admin";
+import { getAdminDb, initializeFirebaseAdmin } from "../lib/firebase-admin";
 import { Timestamp } from "firebase-admin/firestore";
+
+// Initialize Firebase Admin on module load
+initializeFirebaseAdmin();
 
 export interface IPBan {
   id: string;

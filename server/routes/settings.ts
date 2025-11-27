@@ -1,5 +1,8 @@
 import { RequestHandler } from "express";
-import { getAdminDb } from "../lib/firebase-admin";
+import { getAdminDb, initializeFirebaseAdmin } from "../lib/firebase-admin";
+
+// Initialize Firebase Admin on module load
+initializeFirebaseAdmin();
 
 export interface AIConfig {
   model: string;
