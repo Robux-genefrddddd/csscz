@@ -112,9 +112,11 @@ export function ChatArea({ conversationId }: ChatAreaProps) {
     }
 
     const userMessageText = message;
+    const isImage = isImageRequest(userMessageText);
     setMessage("");
     setLoading(true);
-    setIsThinking(true);
+    if (!isImage) setIsThinking(true);
+    if (isImage) setGeneratingImage(true);
 
     try {
       // Add user message to chat
@@ -133,23 +135,30 @@ export function ChatArea({ conversationId }: ChatAreaProps) {
         `user:${userMessageText}`,
       );
 
-      // Get AI response
-      const conversationHistory = chatMessages.map((msg) => ({
-        role: msg.role,
-        content: msg.content,
-      }));
+      let assistantContent: string;
 
-      setIsThinking(false);
-      const aiResponse = await AIService.sendMessage(
-        userMessageText,
-        conversationHistory,
-      );
+      if (isImage) {
+        // Generate image
+        assistantContent = await generateImage(userMessageText);
+      } else {
+        // Get AI response for normal chat
+        const conversationHistory = chatMessages.map((msg) => ({
+          role: msg.role,
+          content: msg.content,
+        }));
 
-      // Add AI response to chat
+        setIsThinking(false);
+        assistantContent = await AIService.sendMessage(
+          userMessageText,
+          conversationHistory,
+        );
+      }
+
+      // Add assistant response to chat
       const assistantMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: aiResponse,
+        content: assistantContent,
         timestamp: Date.now(),
       };
       setChatMessages((prev) => [...prev, assistantMsg]);
@@ -158,7 +167,7 @@ export function ChatArea({ conversationId }: ChatAreaProps) {
       await MessagesService.addMessage(
         conversationId,
         user.uid,
-        `assistant:${aiResponse}`,
+        `assistant:${assistantContent}`,
       );
 
       // Update message count in Firebase
@@ -166,6 +175,10 @@ export function ChatArea({ conversationId }: ChatAreaProps) {
         user.uid,
         userData.messagesUsed + 1,
       );
+
+      if (isImage) {
+        toast.success("Image générée avec succès!");
+      }
     } catch (error) {
       console.error("Error sending message:", error);
       toast.error(
@@ -174,6 +187,7 @@ export function ChatArea({ conversationId }: ChatAreaProps) {
     } finally {
       setLoading(false);
       setIsThinking(false);
+      setGeneratingImage(false);
     }
   };
 
