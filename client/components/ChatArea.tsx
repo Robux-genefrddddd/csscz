@@ -284,8 +284,8 @@ export function ChatArea({ conversationId }: ChatAreaProps) {
             {(loading || isThinking) && (
               <div className="flex justify-start animate-slideUp">
                 <div className="flex gap-3 items-start">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center flex-shrink-0 mt-1 shadow-md">
-                    <span className="text-xs font-bold text-white">G</span>
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center flex-shrink-0 mt-1 shadow-md border border-orange-400/50 ring-2 ring-orange-400/20">
+                    <span className="text-xs font-bold text-white">V</span>
                   </div>
                   <ThinkingAnimation />
                 </div>
