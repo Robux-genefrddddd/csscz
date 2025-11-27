@@ -56,8 +56,28 @@ export function createServer() {
   // Admin routes (require authentication)
   app.post("/api/admin/verify", handleVerifyAdmin);
   app.post("/api/admin/ban-user", handleBanUser);
+  app.post("/api/admin/ban-ip", handleBanIP);
+  app.post("/api/admin/delete-user", handleDeleteUser);
   app.get("/api/admin/users", handleGetAllUsers);
   app.post("/api/admin/create-license", handleCreateLicense);
+
+  // 404 handler
+  app.use((_req, res) => {
+    res.status(404).json({ error: "Not found" });
+  });
+
+  // Error handler
+  app.use(
+    (
+      err: unknown,
+      _req: express.Request,
+      res: express.Response,
+      _next: express.NextFunction,
+    ) => {
+      console.error("Unhandled error:", err);
+      res.status(500).json({ error: "Internal server error" });
+    },
+  );
 
   return app;
 }
