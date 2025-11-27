@@ -237,7 +237,7 @@ export function ChatArea({ conversationId }: ChatAreaProps) {
             </div>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-6 pb-4">
             {chatMessages.map((msg) => (
               <div
                 key={msg.id}
@@ -245,20 +245,40 @@ export function ChatArea({ conversationId }: ChatAreaProps) {
                   msg.role === "user" ? "justify-end" : "justify-start"
                 } animate-slideUp`}
               >
-                <div
-                  className={`max-w-xs lg:max-w-md px-4 py-3 rounded-lg ${
-                    msg.role === "user"
-                      ? "bg-white/20 text-white rounded-br-none"
-                      : "bg-white/10 text-foreground/90 rounded-bl-none"
-                  }`}
-                >
-                  <MessageRenderer content={msg.content} role={msg.role} />
-                </div>
+                {msg.role === "user" ? (
+                  <div className="flex gap-3 max-w-2xl items-start">
+                    <div className="flex-1 max-w-lg">
+                      <div className="rounded-2xl rounded-tr-none bg-gradient-to-br from-blue-600/40 to-blue-700/30 border border-blue-500/30 px-5 py-3 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow">
+                        <p className="text-white/95 text-sm leading-relaxed break-words">
+                          <MessageRenderer content={msg.content} role={msg.role} />
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex gap-3 max-w-2xl items-start">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center flex-shrink-0 mt-1 shadow-md">
+                      <span className="text-xs font-bold text-white">G</span>
+                    </div>
+                    <div className="flex-1 max-w-lg">
+                      <div className="rounded-2xl rounded-tl-none bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-white/10 px-5 py-4 backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow">
+                        <p className="text-white/90 text-sm leading-relaxed break-words">
+                          <MessageRenderer content={msg.content} role={msg.role} />
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
             {(loading || isThinking) && (
               <div className="flex justify-start animate-slideUp">
-                <ThinkingAnimation />
+                <div className="flex gap-3 items-start">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center flex-shrink-0 mt-1 shadow-md">
+                    <span className="text-xs font-bold text-white">G</span>
+                  </div>
+                  <ThinkingAnimation />
+                </div>
               </div>
             )}
             <div ref={messagesEndRef} />
