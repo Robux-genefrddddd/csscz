@@ -7,7 +7,7 @@ service cloud.firestore {
     }
     
     function isAdmin() {
-      return isAuth() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+      return isAuth() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('isAdmin', false) == true;
     }
     
     function isOwner(userId) {
@@ -16,41 +16,41 @@ service cloud.firestore {
     
     // Users collection - authenticated users only
     match /users/{userId} {
-      allow read: if isAuth() && (isOwner(userId) || isAdmin());
-      allow write: if isOwner(userId);
-      allow create: if isAuth();
+      allow read: if isAuth();
+      allow create: if isAuth() && isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId) || isAdmin();
     }
     
-    // Licenses collection - admin only
+    // Licenses collection - admin only, or user can read their own
     match /licenses/{licenseId} {
-      allow read: if isAdmin() || (isAuth() && resource.data.createdBy == request.auth.uid);
+      allow read: if isAuth();
       allow write: if isAdmin();
-      allow create: if isAdmin();
-      allow delete: if isAdmin();
+      allow create: if isAuth();
     }
     
     // Conversations collection - user's own conversations
     match /conversations/{conversationId} {
       allow read: if isAuth() && resource.data.userId == request.auth.uid;
-      allow write: if isAuth() && resource.data.userId == request.auth.uid;
       allow create: if isAuth();
+      allow update: if isAuth() && resource.data.userId == request.auth.uid;
+      allow delete: if isAuth() && resource.data.userId == request.auth.uid;
     }
     
-    // Messages collection - user can access their conversation messages
+    // Messages collection - user can access their messages
     match /messages/{messageId} {
-      allow read: if isAuth() && (
-        request.auth.uid == resource.data.userId || 
-        get(/databases/$(database)/documents/conversations/$(resource.data.conversationId)).data.userId == request.auth.uid
-      );
-      allow write: if isAuth() && request.auth.uid == resource.data.userId;
+      allow read: if isAuth() && resource.data.userId == request.auth.uid;
       allow create: if isAuth();
+      allow update: if isAuth() && resource.data.userId == request.auth.uid;
+      allow delete: if isAuth() && resource.data.userId == request.auth.uid;
     }
     
-    // User IPs - admin only for read/write
+    // User IPs - users can create, admins can read
     match /user_ips/{docId} {
       allow read: if isAdmin();
-      allow write: if isAdmin();
       allow create: if isAuth();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
     }
     
     // IP Bans - admin only
