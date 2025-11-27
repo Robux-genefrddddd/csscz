@@ -34,7 +34,7 @@ const EMOJIS = [
   "❤️",
   "✨",
   "🚀",
-  "💯",
+  "���",
 ];
 
 interface ChatMessage {
@@ -104,6 +104,24 @@ export function ChatArea({ conversationId }: ChatAreaProps) {
   const handleSend = async () => {
     if (!message.trim() || !user || !userData || !conversationId) return;
 
+    // Rate limiting check
+    if (!messageRateLimiter.current.isAllowed()) {
+      toast.error("Trop de messages. Veuillez attendre avant d'envoyer un nouveau message.");
+      return;
+    }
+
+    // Validate message content
+    if (!validateMessageContent(message)) {
+      toast.error("Message invalide. Longueur: 1-5000 caractères.");
+      return;
+    }
+
+    // Detect injection attempts
+    if (detectInjectionAttempt(message)) {
+      toast.error("Message contains invalid characters or patterns.");
+      return;
+    }
+
     // Check message limit
     if (userData.messagesUsed >= userData.messagesLimit) {
       toast.error(
@@ -120,7 +138,9 @@ export function ChatArea({ conversationId }: ChatAreaProps) {
       );
     }
 
-    const userMessageText = message;
+    // Sanitize message
+    const sanitizedMessage = sanitizeInput(message.trim());
+    const userMessageText = sanitizedMessage;
     const isImage = isImageRequest(userMessageText);
     setMessage("");
     setLoading(true);
