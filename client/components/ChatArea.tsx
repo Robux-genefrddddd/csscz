@@ -288,11 +288,11 @@ export function ChatArea({ conversationId }: ChatAreaProps) {
 
       {/* Message Input Area */}
       <div
-        className="px-6 py-6 animate-slideUp"
+        className="px-8 py-6 animate-slideUp"
         style={{ animationDelay: "0.2s" }}
       >
         <div
-          className={`flex items-center gap-3 border-2 border-white rounded-2xl px-4 py-3 bg-background/50 transition-colors group ${!conversationId ? "opacity-50 cursor-not-allowed" : "hover:border-white/80"}`}
+          className={`flex items-center gap-3 border-2 border-white/30 rounded-2xl px-5 py-4 bg-gradient-to-r from-white/5 to-white/8 backdrop-blur-sm transition-all duration-300 group ${!conversationId ? "opacity-50 cursor-not-allowed" : "hover:border-white/50 hover:bg-gradient-to-r hover:from-white/8 hover:to-white/12 focus-within:border-white/80 focus-within:shadow-lg focus-within:shadow-white/10"}`}
         >
           <input
             id="message-input"
